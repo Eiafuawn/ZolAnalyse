@@ -2,12 +2,11 @@ from TextProcessing import TextProcesser
 
 
 def main():
-    path = "C:\\Users\\kenan\\code\\python\\nlp\\characterAnalysis\\letranger.txt"
+    path = "C:\\Users\\kenan\\code\\python\\nlp\\characterAnalysis\\letranger2.txt"
     textProcesser = TextProcesser(path)
-    textProcesser.render("entities")
-    # textProcesser.getEntities(False)
-    # textProcesser.getSentence(False)
-    # textProcesser.getProcessedTxt(False)
+    textProcesser.processBySentence()
+    textProcesser.render("entities_by_sentence")
+    textProcesser.render("sentence")
 
 if __name__ == "__main__":
     main()
