@@ -3,8 +3,10 @@
 
 import spacy
 from nltk.tokenize import sent_tokenize
-nlp = spacy.load('fr_core_news_sm')
+from textblob import TextBlob
 
+# French NER model
+nlp = spacy.load('fr_core_news_sm')
 
 def flatten(input_list):
     '''
@@ -26,10 +28,13 @@ def flatten(input_list):
 def read_text(path):
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
         data = f.read().replace('\n', '').replace('\r', '').replace("\'", "'")
-
     return data
 
+
 def name_entity_recognition(sentence):
+    '''
+    A function to recognize the name entity in a sentence.
+    '''
     doc = nlp(sentence)
      # retrieve person and organization's name from the sentence
     name_entity = [x for x in doc.ents if x.label_ in ['PER', 'ORG']]
@@ -43,17 +48,53 @@ def name_entity_recognition(sentence):
     name_entity = [x for x in name_entity if len(x) >= 3]
     if len(name_entity) > 0:
         return name_entity
-    
+ 
+
+def extract_adjectives(sentence):
+    '''
+    A function to extract adjectives from a sentence.
+    '''
+    doc = nlp(sentence)
+    adjectives = [token.text for token in doc if token.pos_ == "ADJ"]
+    return adjectives
+
+
+def perform_sentiment_analysis(sentence):
+    blob = TextBlob(sentence)
+    return blob.sentiment.polarity
+
+""" def perform_emotion_detection(text):
+    inputs = tokenizer(text, return_tensors="pt")
+    labels = torch.tensor([1]).unsqueeze(0)  # Assuming "1" represents a generic label
+    with torch.no_grad():
+        outputs = model(**inputs, labels=labels)
+        logits = outputs.logits
+    return logits[0].tolist() """
 
 if __name__ == '__main__':
     path = "C:\\Users\\kenan\\code\\python\\nlp\\characterAnalysis\\letranger3.txt"
     text = read_text(path)
     text = sent_tokenize(text)
     ent_list = []
+    adj_list = []
+    sent_scores = []
+    emo_labels = []
+    emo_scores = []
+
     for sentence in text:
         ent = name_entity_recognition(sentence)
-        if ent != None:
+        if ent is not None:
             ent_list.append(ent)
+        
+        adj = extract_adjectives(sentence)
+        if adj:
+            adj_list.extend(adj)
 
-    ent_list = flatten(ent_list)
-    print(ent_list)
+        sentiment_score = perform_sentiment_analysis(sentence)
+        sent_scores.append(sentiment_score)
+
+    print("Named Entities:", ent_list)
+    print("Adjectives:", adj_list)
+    print("Sentiment Scores:", sent_scores)
+    print("Emotion Labels:", emo_labels)
+    print("Emotion Scores:", emo_scores)
