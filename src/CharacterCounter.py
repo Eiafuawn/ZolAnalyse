@@ -3,7 +3,14 @@
 
 import spacy
 from nltk.tokenize import sent_tokenize
-from textblob import TextBlob
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import pipeline
+
+tokenizer = AutoTokenizer.from_pretrained("camembert-base")
+model = AutoModelForSequenceClassification.from_pretrained("camembert-base-emotion")
+
+# French sentiment analysis model
+nlp_sent = pipeline('sentiment-analysis', model=model, tokenizer=tokenizer)
 
 # French NER model
 nlp = spacy.load('fr_core_news_sm')
@@ -60,8 +67,9 @@ def extract_adjectives(sentence):
 
 
 def perform_sentiment_analysis(sentence):
-    blob = TextBlob(sentence)
-    return blob.sentiment.polarity
+    sentiment = nlp_sent(sentence)
+    return sentiment
+
 
 """ def perform_emotion_detection(text):
     inputs = tokenizer(text, return_tensors="pt")
@@ -78,8 +86,8 @@ if __name__ == '__main__':
     ent_list = []
     adj_list = []
     sent_scores = []
-    emo_labels = []
-    emo_scores = []
+    # emo_labels = []
+    # emo_scores = []
 
     for sentence in text:
         ent = name_entity_recognition(sentence)
@@ -96,5 +104,5 @@ if __name__ == '__main__':
     print("Named Entities:", ent_list)
     print("Adjectives:", adj_list)
     print("Sentiment Scores:", sent_scores)
-    print("Emotion Labels:", emo_labels)
-    print("Emotion Scores:", emo_scores)
+    # print("Emotion Labels:", emo_labels)
+    # print("Emotion Scores:", emo_scores)
